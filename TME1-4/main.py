@@ -295,15 +295,32 @@ def GaleShapleyCoteSpe_nbIter(lPrefEtu: list[list[int]], capacites: list[int], l
 	return M, it
 
 
-def tracer2courbes(x: list[int], y1: list[float], y1Label:str, y2: list[float], y2Label:str, ylabel:str):
+
+
+def genererPL(lPrefEtu: list[list[int]], capacites: list[int], lPrefSpe: list[list[int]]):
+	n = len(lPrefEt)	#n=nb étudiants
+	m = len(lPrefSpe)	#m=nb étudiants
 	
-	plt.title("Comparaison des temps d'exécution de GS coté étudiant, coté spécialité")
-	plt.plot(x,y1,color='green', label=y1Label)
-	plt.plot(x,y2,color='blue', label=y2Label)
-	plt.xlabel('n')
-	plt.ylabel(ylabel)
-	plt.legend()
-	plt.show()
+	kPremPrefEtu = [ligne[:k] for ligne in lPrefEtu]
+	kPremPrefSpe = [ligne[:k] for ligne in lPrefSpe]
+	E=[]
+	for i,ligne in enumerate(kPremPrefEtu):
+		for spe in ligne:
+			if spe in kPremPrefSpe[i]:
+				E.append((i,spe))
+
+	for i in range(len(lPrefEtu)):
+		for couple in []
+
+	f.open("Q9.lp","w+")
+	f.write("Maximize\n")
+	f.write("obj: ")
+	for i,couple in enumerate(E):
+		
+		f.write("x"+str(i))
+		if i < len(E)-1:
+			f.write(" + ")
+	f.write("Subject To")
 
 
 '''
@@ -412,6 +429,11 @@ def main():
 	plt.show()
 
 	#On voit que le nombre d'itérations est linéaire par rapport à n.  C'est cohérent avec la complexité théorique, i.e. O(n) tours de boucles, chacun en O(n) pour une complexité globale de O(n**2)
+
+
+#Q9
+
+
 
 if __name__ == "__main__":
 	main()
