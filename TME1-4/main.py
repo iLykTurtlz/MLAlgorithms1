@@ -4,6 +4,7 @@ import copy
 import random
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 def lirePreferencesEtuSurSpe(nomFichier: str) -> list[list[int]]:
 	lignes = lectureFichier(nomFichier)
@@ -298,7 +299,7 @@ def GaleShapleyCoteSpe_nbIter(lPrefEtu: list[list[int]], capacites: list[int], l
 
 
 def genererPL(lPrefEtu: list[list[int]], capacites: list[int], lPrefSpe: list[list[int]]):
-	n = len(lPrefEt)	#n=nb étudiants
+	n = len(lPrefEtu)	#n=nb étudiants
 	m = len(lPrefSpe)	#m=nb étudiants
 	
 	kPremPrefEtu = [ligne[:k] for ligne in lPrefEtu]
@@ -309,18 +310,67 @@ def genererPL(lPrefEtu: list[list[int]], capacites: list[int], lPrefSpe: list[li
 			if spe in kPremPrefSpe[i]:
 				E.append((i,spe))
 
-	for i in range(len(lPrefEtu)):
-		for couple in []
+	#for i in range(len(lPrefEtu)):
+		#for couple in []
 
 	f.open("Q9.lp","w+")
 	f.write("Maximize\n")
 	f.write("obj: ")
+	contraintes_etu = np.zeros(n,len(E))	#matrice[etudiant i, arete i]
+	contraintes_spe = np.zeros(m,len(E))	#matrice[specialisation i, arete j]
 	for i,couple in enumerate(E):
-		
-		f.write("x"+str(i))
+		etu,spe = couple
+		f.write("x"+str(i))		#écriture de l'objective
 		if i < len(E)-1:
 			f.write(" + ")
-	f.write("Subject To")
+		
+		assert(contraintes_etu[etu][i] == 0)	#préparation des matrices pour écriture des contraintes
+		contraintes_etu[etu][i] = 1
+
+		assert(contraintes_spe[spe][i] == 0)
+		contraintes_spe[spe][i] = 1
+
+
+	#écriture des contraintes
+	f.write("Subject To\n")
+	k=1
+	for etu_list in contraintes_etu:
+		f.write("c"+str(k)+": ")
+		for i in range(len(etu_list)):	#xi est la variable en question
+			if i==1:
+				f.write("x"+str(i))
+			if i < (len(etu_list)-1):
+				f.write(" + ")
+		f.write(" <= 1\n")
+		k+=1
+
+	for j, spe_list in enumerate(contraintes_spe):
+		f.write("c"+str(k)+": ")
+		for i in range(len(spe_list)):
+			if i==1:
+				f.write("x"+str(i))
+			if i < (len(etu_list)-1):
+				f.write(" + ")
+		f.write(" <= "+str(capacites[j]+"\n"))
+
+	f.write("Binary\n")
+	for i in range(len(E)):
+		f.write("x"+str(i)+" ")
+	f.write("\nEnd\n")
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+
 
 
 '''
