@@ -298,26 +298,32 @@ def GaleShapleyCoteSpe_nbIter(lPrefEtu: list[list[int]], capacites: list[int], l
 
 
 
-def genererPL(lPrefEtu: list[list[int]], capacites: list[int], lPrefSpe: list[list[int]]):
+def genererPL(lPrefEtu: list[list[int]], capacites: list[int], lPrefSpe: list[list[int]], k: int):
+	"""
+	en entrée :	la matrice lPrefEtu[i,j] des préférences j pour chaque étudiant i
+				la liste d'entiers des capacités de chaque parcours
+				la matrice lPrefSpe[i,j] des préférences j pour chaque parcours i
+				l'entier k : ce programme écrit un PL (par effet de bord) pour le nombre d'arêtes d'un graphe maxima
+	"""
 	n = len(lPrefEtu)	#n=nb étudiants
 	m = len(lPrefSpe)	#m=nb étudiants
 	
 	kPremPrefEtu = [ligne[:k] for ligne in lPrefEtu]
-	kPremPrefSpe = [ligne[:k] for ligne in lPrefSpe]
+	kPremPrefSpe = lPrefSpe#[ligne[:k] for ligne in lPrefSpe]
 	E=[]
 	for i,ligne in enumerate(kPremPrefEtu):
 		for spe in ligne:
-			if spe in kPremPrefSpe[i]:
+			if i in kPremPrefSpe[spe]:
 				E.append((i,spe))
 
 	#for i in range(len(lPrefEtu)):
 		#for couple in []
 
-	f.open("Q9.lp","w+")
+	f = open("Q9.lp","w+")
 	f.write("Maximize\n")
 	f.write("obj: ")
-	contraintes_etu = np.zeros(n,len(E))	#matrice[etudiant i, arete i]
-	contraintes_spe = np.zeros(m,len(E))	#matrice[specialisation i, arete j]
+	contraintes_etu = np.zeros((n,len(E)))	#matrice[etudiant i, arete i]
+	contraintes_spe = np.zeros((m,len(E)))	#matrice[specialisation i, arete j]
 	for i,couple in enumerate(E):
 		etu,spe = couple
 		f.write("x"+str(i))		#écriture de l'objective
@@ -332,31 +338,33 @@ def genererPL(lPrefEtu: list[list[int]], capacites: list[int], lPrefSpe: list[li
 
 
 	#écriture des contraintes
-	f.write("Subject To\n")
-	k=1
+	f.write("\nSubject To\n")
+	p=1									#indice p de la contrainte...les autres lettres étant prises
 	for etu_list in contraintes_etu:
-		f.write("c"+str(k)+": ")
+		f.write("c"+str(p)+": ")
 		for i in range(len(etu_list)):	#xi est la variable en question
 			if i==1:
 				f.write("x"+str(i))
-			if i < (len(etu_list)-1):
-				f.write(" + ")
+				if i < (len(etu_list)-1):
+					f.write(" + ")
 		f.write(" <= 1\n")
-		k+=1
+		p+=1
 
 	for j, spe_list in enumerate(contraintes_spe):
-		f.write("c"+str(k)+": ")
+		f.write("c"+str(p)+": ")
 		for i in range(len(spe_list)):
 			if i==1:
 				f.write("x"+str(i))
 			if i < (len(etu_list)-1):
 				f.write(" + ")
-		f.write(" <= "+str(capacites[j]+"\n"))
+		f.write(" <= "+str(capacites[j])+"\n")
+		p+=1
 
 	f.write("Binary\n")
 	for i in range(len(E)):
 		f.write("x"+str(i)+" ")
 	f.write("\nEnd\n")
+	f.close()
 
 
 
@@ -426,7 +434,7 @@ def main():
 #Q6
 
 #COMPLEXITE TEMPORELLE - GRAPHES
-
+	'''
 	#on crée deux graphes:
 	fig, axes = plt.subplots(nrows=2, ncols=1) 
 
@@ -463,7 +471,7 @@ def main():
 #Q8
 
 	#NOMBRE MOYEN D'ITERATIONS - GRAPHES
-
+	
 	#Un seul graphe suffit
 	fig2,axes2 = plt.subplots()
 
@@ -479,10 +487,11 @@ def main():
 	plt.show()
 
 	#On voit que le nombre d'itérations est linéaire par rapport à n.  C'est cohérent avec la complexité théorique, i.e. O(n) tours de boucles, chacun en O(n) pour une complexité globale de O(n**2)
-
+	'''
 
 #Q9
-
+	prefEtu, cap, prefSpe = genererPref(15)
+	genererPL(prefEtu, cap, prefSpe, 1)
 
 
 if __name__ == "__main__":
